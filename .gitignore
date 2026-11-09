@@ -28,3 +28,11 @@ data/processed/
 # PlantVillage image dataset
 data/plantvillage/
 data/tfds/
+
+# LaTeX temporary files
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz

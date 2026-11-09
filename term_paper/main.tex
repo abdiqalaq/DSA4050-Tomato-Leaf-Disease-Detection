@@ -1,0 +1,200 @@
+
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{amsmath}
+
+\setstretch{1.3}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue}
+
+\title{\textbf{Tomato Leaf Disease Detection Using Deep Learning:}\\
+A Comparative Analysis of Custom CNN and MobileNetV2}
+\author{
+Abdiqalaq Issack\\
+United States International University--Africa\\
+DSA4050\_XA -- Deep Learning
+}
+\date{November 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Tomato diseases can reduce agricultural productivity when symptoms are not identified early. This project investigates the application of deep learning to tomato leaf disease classification using digital images. Two approaches were implemented: a custom convolutional neural network (CNN) and MobileNetV2 using transfer learning. A dataset of 18,160 tomato leaf images representing ten classes was divided into training, validation, and testing sets. Both models were trained using image augmentation, class weighting, and early stopping. On the test dataset, the custom CNN achieved 70.70\% accuracy, while MobileNetV2 achieved 89.65\%. An interactive Streamlit dashboard was developed to display experimental results and classify uploaded leaf images. The findings demonstrate the potential of pretrained deep learning architectures for image-based plant disease classification, while highlighting the need for additional testing under real farming conditions.
+\end{abstract}
+
+\section{Introduction}
+
+Tomato production is affected by diseases that damage leaves, reduce plant growth, and potentially lower crop yields. Identifying diseases through visual inspection can be challenging because symptoms may overlap and their appearance changes with disease severity.
+
+Deep learning offers an alternative by automatically learning visual patterns from labelled images. Convolutional neural networks are particularly suitable for image classification because they can detect features such as edges, textures, shapes, and colour variations.
+
+This project focuses on classifying healthy and diseased tomato leaves using the PlantVillage dataset. It compares a CNN trained from scratch with MobileNetV2, a pretrained architecture, and demonstrates the resulting classification system through an interactive dashboard.
+
+\section{Justification for Deep Learning}
+
+Traditional image classification often depends on manually designed features such as colour histograms, texture measurements, and shape descriptors. These features may not capture all the visual differences between plant diseases.
+
+CNNs learn relevant features directly from images through successive convolutional layers. Earlier layers identify simple visual patterns, while deeper layers learn more complex representations.
+
+Transfer learning can be useful when computational resources or labelled training examples are limited. Instead of learning all image features from the beginning, a pretrained network provides representations learned from a large image dataset.
+
+MobileNetV2 was selected because it provides an efficient architecture designed for image recognition tasks (Sandler et al., 2018). Comparing it with a custom CNN makes it possible to investigate the benefit of pretrained features for tomato disease classification.
+
+\section{Dataset and Preparation}
+
+The project used tomato leaf images from the PlantVillage dataset, a widely used resource for image-based plant disease research (Hughes \& Salathé, 2015).
+
+The selected dataset contained 18,160 images across ten categories, including healthy leaves and different tomato diseases.
+
+The dataset was divided into three subsets, as shown in Table~\ref{tab:splits}.
+
+\begin{table}[H]
+\centering
+\caption{Dataset distribution}
+\label{tab:splits}
+\begin{tabular}{lrr}
+\toprule
+Subset & Images & Percentage\\
+\midrule
+Training & 14,528 & 80\%\\
+Validation & 1,816 & 10\%\\
+Testing & 1,816 & 10\%\\
+\midrule
+Total & 18,160 & 100\%\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All images were resized to $224 \times 224$ pixels. The custom CNN received pixel values scaled to the range $[0,1]$, while MobileNetV2 used its architecture-specific preprocessing.
+
+During training, random horizontal and vertical flipping, rotation, and zooming were applied to improve robustness. Balanced class weights were also calculated to reduce the influence of unequal class frequencies.
+
+\section{Methodology}
+
+\subsection{Custom Convolutional Neural Network}
+
+The custom CNN was developed using TensorFlow and Keras. Its architecture contained four convolutional layers with 32, 64, 128, and 256 filters respectively.
+
+Each convolution used a $3 \times 3$ kernel, ReLU activation, and same padding, followed by max pooling. Global average pooling was applied before a dense layer containing 128 neurons.
+
+A dropout rate of 0.4 was used to reduce overfitting, followed by a softmax output layer for ten-class classification.
+
+The model was trained using Adam with a learning rate of 0.001 and sparse categorical cross-entropy loss.
+
+\subsection{MobileNetV2 Transfer Learning}
+
+The second model used MobileNetV2 with ImageNet-pretrained weights. Its original classification layer was removed, and the pretrained feature-extraction backbone was frozen.
+
+A new classification head was added, consisting of global average pooling, a dense layer with 128 ReLU neurons, dropout of 0.4, and a softmax output layer.
+
+The model was trained using Adam with a learning rate of 0.0001 and sparse categorical cross-entropy loss.
+
+Only the newly added classification layers were trained; the pretrained backbone was not fine-tuned.
+
+\subsection{Training Configuration}
+
+Both models used a batch size of 16, a maximum of ten epochs, and a random seed of 42.
+
+Model checkpoints saved the weights corresponding to the lowest validation loss. Early stopping with a patience of three epochs was used to reduce unnecessary training.
+
+Training and validation histories were saved for subsequent analysis.
+
+\section{Evaluation and Results}
+
+The trained models were evaluated using the held-out test dataset. Performance was measured using accuracy, precision, recall, F1-score, and confusion matrices.
+
+Accuracy measures the proportion of correctly classified samples:
+
+\begin{equation}
+\text{Accuracy} =
+\frac{\text{Correct Predictions}}{\text{Total Predictions}}
+\end{equation}
+
+Precision measures the proportion of predicted positives that are correct, while recall measures the proportion of actual positives correctly identified. F1-score combines precision and recall using their harmonic mean.
+
+Table~\ref{tab:results} presents the experimental results.
+
+\begin{table}[H]
+\centering
+\caption{Test-set model performance}
+\label{tab:results}
+\begin{tabular}{lcc}
+\toprule
+Metric & Custom CNN & MobileNetV2\\
+\midrule
+Accuracy & 70.70\% & 89.65\%\\
+Precision & 68.48\% & 87.30\%\\
+Recall & 70.91\% & 88.70\%\\
+F1-score & 67.20\% & 87.66\%\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+MobileNetV2 achieved the best performance across all four reported metrics. Its accuracy exceeded that of the custom CNN by 18.95 percentage points.
+
+This improvement suggests that features learned from ImageNet were beneficial for the tomato leaf classification task. The custom CNN learned directly from the selected dataset, while MobileNetV2 benefited from pretrained visual representations.
+
+However, the results should not be interpreted as proof that MobileNetV2 will always outperform a custom CNN. Differences in architecture, optimization settings, and available computational resources may influence the comparison.
+
+Confusion matrices were generated to examine correct classifications and errors across the ten classes.
+
+\section{Interactive Streamlit Dashboard}
+
+An interactive dashboard was developed using Streamlit to make the experimental results accessible.
+
+The dashboard contains four sections: Disease Prediction, Model Comparison, Training Performance, and Confusion Matrices.
+
+Users can upload a tomato leaf image in JPG or PNG format. The application resizes the image to $224 \times 224$ pixels and passes it to the saved MobileNetV2 model.
+
+The dashboard displays the predicted disease, model confidence, and a bar chart showing class probabilities.
+
+Additional pages present model evaluation metrics, training and validation accuracy and loss curves, and confusion matrices.
+
+The dashboard demonstrates how a trained image classifier can be integrated into a user-facing application.
+
+\section{Limitations}
+
+The evaluation used PlantVillage images, which may not fully represent conditions encountered in farms. Changes in lighting, image backgrounds, camera quality, and disease severity may affect performance.
+
+The dashboard also provides predictions rather than confirmed agricultural diagnoses. The reported confidence represents the model's output probability and should not automatically be interpreted as a calibrated measure of correctness.
+
+Future work could evaluate the models using field photographs, investigate additional architectures, and examine methods for improving generalization.
+
+\section{Conclusion}
+
+This project demonstrated the application of deep learning to tomato leaf disease classification. Two models were developed and evaluated using 18,160 images representing ten classes.
+
+MobileNetV2 achieved 89.65\% test accuracy compared with 70.70\% for the custom CNN, indicating a substantial benefit from transfer learning in this experiment.
+
+The Streamlit dashboard further demonstrated practical image classification through an interactive interface.
+
+Overall, the project shows the potential of deep learning to support agricultural disease recognition, although further real-world validation is required.
+
+\begin{thebibliography}{9}
+
+\bibitem{hughes2015}
+Hughes, D. P., \& Salathé, M. (2015).
+An open access repository of images on plant health to enable the development of mobile disease diagnostics.
+\textit{arXiv preprint arXiv:1511.08060}.
+\url{https://arxiv.org/abs/1511.08060}
+
+\bibitem{sandler2018}
+Sandler, M., Howard, A., Zhu, M., Zhmoginov, A., \& Chen, L.-C. (2018).
+MobileNetV2: Inverted residuals and linear bottlenecks.
+In \textit{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition} (pp. 4510--4520).
+
+\bibitem{mohanty2016}
+Mohanty, S. P., Hughes, D. P., \& Salathé, M. (2016).
+Using deep learning for image-based plant disease detection.
+\textit{Frontiers in Plant Science, 7}, 1419.
+\url{https://doi.org/10.3389/fpls.2016.01419}
+
+\end{thebibliography}
+
+\end{document}
