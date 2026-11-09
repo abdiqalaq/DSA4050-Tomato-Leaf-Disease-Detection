@@ -1,0 +1,30 @@
+# Python virtual environment
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# macOS files
+.DS_Store
+
+# Environment variables
+.env
+
+# Large datasets
+data/raw/
+data/processed/
+
+# Ignore temporary model files
+*.h5
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Development assistant files
+.agents/
+
+# PlantVillage image dataset
+data/plantvillage/
+data/tfds/
